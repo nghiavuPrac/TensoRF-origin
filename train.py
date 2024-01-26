@@ -90,8 +90,15 @@ def reconstruction(args):
 
     # init dataset
     dataset = dataset_dict[args.dataset_name]
-    train_dataset = dataset(args.datadir, split='train', downsample=args.downsample_train, is_stack=False)
-    test_dataset = dataset(args.datadir, split='test', downsample=args.downsample_train, is_stack=True)
+    train_dataset = dataset(args.datadir, split='train', downsample=args.downsample_train, is_stack=False, N_imgs=args.N_train_imgs, indexs=args.train_indexs)
+    test_dataset = dataset(args.datadir, split='test', downsample=args.downsample_train, is_stack=True, N_imgs=args.N_test_imgs, indexs=args.test_indexs)
+
+    if args.N_val_imgs or args.val_indexs:
+        val_dataset = dataset(args.datadir, split='val', downsample=args.downsample_train, is_stack=True, N_imgs=args.N_val_imgs, indexs=args.val_indexs)
+    else:
+        val_dataset = test_dataset
+
+
     white_bg = train_dataset.white_bg
     near_far = train_dataset.near_far
     ndc_ray = args.ndc_ray
@@ -234,7 +241,7 @@ def reconstruction(args):
 
 
         if iteration % args.vis_every == args.vis_every - 1 and args.N_vis!=0:
-            PSNRs_test = evaluation(test_dataset,tensorf, args, renderer, f'{logfolder}/imgs_vis/', N_vis=args.N_vis,
+            PSNRs_test = evaluation(val_dataset,tensorf, args, renderer, f'{logfolder}/imgs_vis/', N_vis=args.N_vis,
                                     prtx=f'{iteration:06d}_', N_samples=nSamples, white_bg = white_bg, ndc_ray=ndc_ray, compute_extra_metrics=False)
             summary_writer.add_scalar('test/psnr', np.mean(PSNRs_test), global_step=iteration)
 
@@ -299,6 +306,8 @@ def reconstruction(args):
                                 N_vis=-1, N_samples=-1, white_bg = white_bg, ndc_ray=ndc_ray,device=device)
 
 
+        return f'{logfolder}/final_{args.expname}.th'
+
 if __name__ == '__main__':
 
     torch.set_default_dtype(torch.float32)
@@ -308,11 +317,13 @@ if __name__ == '__main__':
     args = config_parser()
     print(args)
 
-    if  args.export_mesh:
-        export_mesh(args)
 
     if args.render_only and (args.render_test or args.render_path):
         render_test(args)
     else:
-        reconstruction(args)
+        args.ckpt = reconstruction(args)
+        import shutil 
+        shutil.copy(args.config, args.ckpt[:-3]+'.txt')
 
+    if  args.export_mesh:
+        export_mesh(args)

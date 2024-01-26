@@ -1,10 +1,19 @@
 
 dataset_name = blender
-datadir = ./data/nerf_synthetic/lego
-expname =  tensorf_lego_VM
+datadir = /home/nghia/Work/code/AI_Capstone/3D-reconstruction/data/data/nerf_synthetic/lego
+expname =  tensorf_test
 basedir = ./log
 
-n_iters = 30000
+#------ Number images ------
+train_indexs    = [26, 86, 2, 55, 75, 16, 73, 93]
+val_indexs      = [0,8,16,24,32,40,48,56,64,72,80,88,96]
+test_indexs     = [0,8,16,24,32,40,48,56,64,72,80,88,96,104,112,120,128,136,144,152,160,168,176,184,192]
+
+# N_train_imgs  = 8
+# N_val_imgs    = 13
+# N_test_imgs   = 25
+
+n_iters = 15000
 batch_size = 4096
 
 N_voxel_init = 2097156 # 128**3

@@ -11,13 +11,16 @@ from .ray_utils import *
 
 
 class BlenderDataset(Dataset):
-    def __init__(self, datadir, split='train', downsample=1.0, is_stack=False, N_vis=-1):
+    def __init__(self, datadir, split='train', downsample=1.0, is_stack=False, N_vis=-1, N_imgs=0, indexs=[]):
 
         self.N_vis = N_vis
         self.root_dir = datadir
         self.split = split
         self.is_stack = is_stack
         self.img_wh = (int(800/downsample),int(800/downsample))
+        self.N_imgs = N_imgs
+        self.indexs = indexs
+
         self.define_transforms()
 
         self.scene_bbox = torch.tensor([[-1.5, -1.5, -1.5], [1.5, 1.5, 1.5]])
@@ -61,6 +64,13 @@ class BlenderDataset(Dataset):
 
         img_eval_interval = 1 if self.N_vis < 0 else len(self.meta['frames']) // self.N_vis
         idxs = list(range(0, len(self.meta['frames']), img_eval_interval))
+
+        if len(self.indexs) > 0:
+            idxs = self.indexs
+        elif self.N_imgs > 0 and self.N_imgs < len(idxs):
+            idxs = np.random.choice(idxs, self.N_imgs, replace=False)
+
+
         for i in tqdm(idxs, desc=f'Loading data {self.split} ({len(idxs)})'):#img_list:#
 
             frame = self.meta['frames'][i]

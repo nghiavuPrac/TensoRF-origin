@@ -1,2 +1,3 @@
 *__pycache__*
 log
+configs/nerf_synthetic/*.txt

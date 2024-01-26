@@ -1,8 +1,17 @@
 
+import sys
+import os
+
+scene = sys.argv[1]
+
+dataset_dir = "/content/drive/MyDrive/AI_Capstone/data/nerf_synthetic/"
+log_dir = "/content/drive/MyDrive/AI_Capstone/log/Synthetic NeRF/TensoRF_origin"
+
+content= f'''
 dataset_name = blender
-datadir = /content/drive/MyDrive/AI_Capstone/data/nerf_synthetic/lego
-expname =  lego_tensorf
-basedir = /content/drive/MyDrive/AI_Capstone/log/Synthetic NeRF/TensoRF_origin
+datadir = {os.path.join(dataset_dir,scene)}
+expname =  {scene}_tensorf
+basedir = {log_dir}
 
 
 #------ Number images ------
@@ -49,3 +58,12 @@ rm_weight_mask_thre = 1e-4
 #N_voxel_final = 125000000 # 500**3
 #L1_weight_inital = 1e-5
 #L1_weight_rest = 1e-5
+'''
+
+cur_dir = os.path.join(os.getcwd(),os.path.dirname(sys.argv[0]))
+file_name = f'{scene}.txt'
+save_path = os.path.join(cur_dir,file_name)
+
+
+with open(save_path, 'w') as file:
+    file.write(content)

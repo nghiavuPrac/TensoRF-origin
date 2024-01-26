@@ -306,7 +306,7 @@ def reconstruction(args):
                                 N_vis=-1, N_samples=-1, white_bg = white_bg, ndc_ray=ndc_ray,device=device)
 
 
-        return f'{logfolder}/final_{args.expname}.th'
+        return f'{logfolder}/{args.expname}.th'
 
 if __name__ == '__main__':
 
@@ -318,8 +318,9 @@ if __name__ == '__main__':
     print(args)
 
 
-    if args.render_only and (args.render_test or args.render_path):
-        render_test(args)
+    if args.ckpt:
+      if args.render_only and (args.render_test or args.render_path):
+          render_test(args)
     else:
         args.ckpt = reconstruction(args)
         import shutil 
